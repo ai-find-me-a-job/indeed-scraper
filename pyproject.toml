@@ -11,6 +11,7 @@ dependencies = [
     "constantly==15.1.0",
     "cryptography==40.0.1",
     "cssselect==1.2.0",
+    "dotenv>=0.9.9",
     "filelock==3.10.7",
     "hyperlink==21.0.0",
     "idna==3.4",
@@ -31,8 +32,8 @@ dependencies = [
     "queuelib==1.6.2",
     "requests==2.28.2",
     "requests-file==1.5.1",
-    "scrapeops-scrapy==0.5.2", # Not used yet
-    "scrapeops-scrapy-proxy-sdk==1.0", # Not used yet
+    "scrapeops-scrapy==0.5.2",
+    "scrapeops-scrapy-proxy-sdk==1.0",
     "scrapy==2.8.0",
     "service-identity==21.1.0",
     "six==1.16.0",
@@ -44,3 +45,6 @@ dependencies = [
     "w3lib==2.1.1",
     "zope-interface==6.0",
 ]
+
+[dependency-groups]
+dev = []

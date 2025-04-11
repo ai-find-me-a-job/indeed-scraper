@@ -15,7 +15,13 @@ class IndeedSearchSpider(scrapy.Spider):
     }
 
     def get_indeed_search_url(self, keyword, location, offset=0):
-        parameters = {"q": keyword, "l": location, "filter": 0, "start": offset}
+        parameters = {
+            "q": keyword,
+            # "l": location,
+            # "filter": 0,
+            "start": offset,
+            # "radius":0
+        }
         return "https://www.indeed.com/jobs?" + urlencode(parameters)
 
     def start_requests(self):
@@ -39,7 +45,7 @@ class IndeedSearchSpider(scrapy.Spider):
             r'window.mosaic.providerData\["mosaic-provider-jobcards"\]=(\{.+?\});',
             response.text,
         )
-        if script_tag is not None:
+        if script_tag and len(script_tag) > 0:
             json_blob = json.loads(script_tag[0])
 
             ## Extract Jobs From Search Page

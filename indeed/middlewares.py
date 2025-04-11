@@ -1,5 +1,10 @@
+from dotenv import load_dotenv
+from pathlib import Path
+
+load_dotenv(Path(__file__).parents[1].joinpath(".env"), verbose=True)
 from urllib.parse import urlencode
 from scrapy import Request
+import os
 
 
 class ScrapeOpsProxyMiddleware:
@@ -8,9 +13,12 @@ class ScrapeOpsProxyMiddleware:
         return cls(crawler.settings)
 
     def __init__(self, settings):
-        self.scrapeops_api_key = settings.get("SCRAPEOPS_API_KEY")
+        self.scrapeops_api_key = os.getenv("SCRAPEOPS_API_KEY")
         self.scrapeops_endpoint = "https://proxy.scrapeops.io/v1/?"
         self.scrapeops_proxy_active = settings.get("SCRAPEOPS_PROXY_ENABLED", False)
+        self.scrapeops_cloudflare_bypass = settings.get(
+            "SCRAPEOS_CLOUDFLARE_BYPASS", False
+        )
 
     @staticmethod
     def _param_is_true(request, key):
@@ -24,11 +32,10 @@ class ScrapeOpsProxyMiddleware:
         return response.replace(url=real_url.decode(response.headers.encoding))
 
     def _get_scrapeops_url(self, request):
-        payload = {
-            "api_key": self.scrapeops_api_key,
-            "url": request.url,
-            "bypass": "cloudflare_level_1",
-        }
+        payload = {"api_key": self.scrapeops_api_key, "url": request.url}
+        if self.scrapeops_cloudflare_bypass:
+            payload["bypass"] = "cloudflare_level_1"
+
         if self._param_is_true(request, "sops_render_js"):
             payload["render_js"] = True
         if self._param_is_true(request, "sops_residential"):
@@ -51,7 +58,7 @@ class ScrapeOpsProxyMiddleware:
 
     def process_request(self, request, spider):
         if (
-            self._scrapeops_proxy_enabled is False
+            self._scrapeops_proxy_enabled() is False
             or self.scrapeops_endpoint in request.url
         ):
             return None
